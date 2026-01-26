@@ -1,37 +1,73 @@
 type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 
-type EventItem = {
-  title: string;
-  day: Day;
-  start: number;
-  end: number;
-  className: string;
-};
+document.addEventListener("DOMContentLoaded", () => {
+  const calendar = document.getElementById("calendar") as HTMLDivElement;
+  const membersContainer = document.getElementById("members-container") as HTMLDivElement;
+  const addMemberBtn = document.getElementById("add-member-btn") as HTMLButtonElement;
+  const memberInput = document.getElementById("member-input") as HTMLInputElement;
 
-const days: { key: Day; label: string }[] = [
-  { key: "Mon", label: "Montag" },
-  { key: "Tue", label: "Dienstag" },
-  { key: "Wed", label: "Mittwoch" },
-  { key: "Thu", label: "Donnerstag" },
-  { key: "Fri", label: "Freitag" },
-  { key: "Sat", label: "Samstag" },
-  { key: "Sun", label: "Sonntag" }
-];
+  const days: { key: Day; long: string; short: string }[] = [
+    { key: "Mon", long: "Montag", short: "Mo" },
+    { key: "Tue", long: "Dienstag", short: "Di" },
+    { key: "Wed", long: "Mittwoch", short: "Mi" },
+    { key: "Thu", long: "Donnerstag", short: "Do" },
+    { key: "Fri", long: "Freitag", short: "Fr" },
+    { key: "Sat", long: "Samstag", short: "Sa" },
+    { key: "Sun", long: "Sonntag", short: "So" }
+  ];
 
-const hours = Array.from({ length: 24 }, (_, i) => i); // 0..23
+  const hours = Array.from({ length: 18 }, (_, i) => i + 6);
 
+  const headerRow = document.createElement("div");
+  headerRow.className = "calendar-header";
 
+  function renderHeader() {
+    headerRow.innerHTML =
+      `<div>Zeit</div>` +
+      days.map(d => `<div>${window.innerWidth < 600 ? d.short : d.long}</div>`).join("");
+  }
 
-const calendar = document.getElementById("calendar") as HTMLDivElement;
+  renderHeader();
+  window.addEventListener("resize", renderHeader);
+  calendar.appendChild(headerRow);
 
-/* Header */
-calendar.appendChild(document.createElement("div"));
-days.forEach(d => {
-  const h = document.createElement("div");
-  h.className = "header";
-  h.textContent = d.label;
-  calendar.appendChild(h);
+  const bodyGrid = document.createElement("div");
+  bodyGrid.className = "calendar-body";
+
+  hours.forEach(hour => {
+    const timeCell = document.createElement("div");
+    timeCell.className = "time";
+    timeCell.textContent = `${hour}:00`;
+    bodyGrid.appendChild(timeCell);
+
+    for (let i = 0; i < 7; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      bodyGrid.appendChild(cell);
+    }
+  });
+
+  calendar.appendChild(bodyGrid);
+
+  let members: string[] = ["Mama", "Papa", "Kind 1"];
+
+  function renderMembers() {
+    membersContainer.innerHTML = "";
+    members.forEach(name => {
+      const div = document.createElement("div");
+      div.className = "member";
+      div.textContent = name;
+      membersContainer.appendChild(div);
+    });
+  }
+
+  renderMembers();
+
+  addMemberBtn.addEventListener("click", () => {
+    const name = memberInput.value.trim();
+    if (!name) return;
+    members.push(name);
+    renderMembers();
+    memberInput.value = "";
+  });
 });
-
-
-

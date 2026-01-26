@@ -2,74 +2,97 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Family Week Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;  
-      font-family: 'Poppins', sans-serif;
-      background: #f5f4ff;
-    }
+    /* ===== Grundlegendes Styling ===== */
+    * { box-sizing: border-box; margin:0; padding:0; font-family:"Segoe UI", Arial, sans-serif; }
+    body { background: linear-gradient(180deg,#f7f3ff,#fff); padding:20px; color:#333; }
 
-    h1 {
-      color: #7c3aed;
-      margin: 20px;
-    }
+    header { margin-bottom: 25px; }
+    header h1 { color: #5a00cc; font-size: 2rem; margin-bottom:4px; }
+    header p { color: #8a6cff; margin-bottom:15px; }
 
-    .calendar {
-      display: grid;
-      grid-template-columns: 100px repeat(7, 1fr);
-      margin: 20px;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-    }
+    .nav-bar { display:flex; align-items:center; gap:15px; flex-wrap:wrap; }
+    .nav-btn { border:none; background:none; color:#5a00cc; font-weight:600; cursor:pointer; padding:6px 10px; border-radius:20px; }
+    .nav-btn.active { background:#7a1cff; color:#fff; }
+    .add-btn { margin-left:auto; background:#7a1cff; color:white; border:none; padding:8px 16px; border-radius:20px; cursor:pointer; font-weight:600; }
 
-    .header {
-      background: #f1eaff;
-      padding: 10px;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 1px solid #ddd;
-    }
+    .calendar { background:white; border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.05); margin-bottom:25px; }
+.calendar-header,
+.calendar-body {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+}
 
-    .time {
-      background: #faf7ff;
-      text-align: center;
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-      font-size: 12px;
-      color: #7c3aed;
-    }
+.calendar-header {
+  background: #f3ecff;
+  font-weight: 600;
+  color: #5a00cc;
+}
 
-    .cell {
-      border-bottom: 1px solid #eee;
-      border-left: 1px solid #eee;
-      position: relative;
-    }
+.calendar-header div {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #e5d9ff;
+}
 
-    .event {
-      position: absolute;
-      left: 5px;
-      right: 5px;
-      top: 5px;
-      bottom: 5px;
-      border-radius: 8px;
-      padding: 6px;
-      font-size: 11px;
-      color: #1f1730;
-    }
+.calendar-body {
+  grid-auto-rows: 50px;
+}
+
+.time {
+  padding: 10px;
+  font-size: 0.85rem;
+  color: #8a6cff;
+  border-bottom: 1px solid #f0ebff;
+}
+
+.cell {
+  border-bottom: 1px solid #f0ebff;
+  border-left: 1px solid #f0ebff;
+}
+    .family-box { background:white; padding:18px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+    .family-box h2 { margin-bottom:12px; color:#5a00cc; }
+    .members { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+    .member { background:#ece3ff; padding:6px 14px; border-radius:20px; font-size:0.9rem; color:#5a00cc; }
+    .family-box input { padding:8px; width:200px; border-radius:8px; border:1px solid #ddd; }
+    .family-box button { padding:8px 12px; margin-left:6px; border-radius:8px; border:none; background:#7a1cff; color:white; cursor:pointer; }
+
+    /* ===== Responsive ===== */
+    
+    @media (max-width: 600px){
+  .calendar-header div {
+    font-size: 0.8rem;
+    padding: 8px 4px; }}
 
   </style>
 </head>
 
 <body>
-  <h1>Family Week Dashboard</h1>
+  <header>
+    <h1>Family Week Dashboard</h1>
+    <p>Plane eure Woche gemeinsam</p>
+    <div class="nav-bar">
+      <button class="nav-btn active">Wochenansicht</button>
+      <button class="nav-btn">Wochen-Auswertung</button>
+      <button class="nav-btn">Ideen für nächste Woche</button>
+      <button class="add-btn">+ Termin hinzufügen</button>
+    </div>
+  </header>
 
-  <div class="calendar" id="calendar"></div>
+  <!-- Kalender Container -->
+  <section class="calendar" id="calendar"></section>
+
+  <!-- Familienmitglieder -->
+  <section class="family-box">
+    <h2>Familienmitglieder</h2>
+    <div class="members" id="members-container"></div>
+    <input type="text" placeholder="Name hinzufügen" id="member-input">
+    <button id="add-member-btn">Hinzufügen</button>
+  </section>
 
   <script src="dist/main.js"></script>
+  
 </body>
 </html>
