@@ -109,25 +109,56 @@
     }
 
     .event-block {
-      position: absolute;
-      border-radius: 8px;
-      padding: 4px 6px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-size: 0.8rem;
-      font-weight: 600; 
-      color: #000 !important;
-        opacity: 0.82;                 /* ✨ transparenter */
+  position: absolute;
+  border-radius: 8px;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600; 
+  color: #000;
+  opacity: 0.82;
   backdrop-filter: saturate(1.2);
-
   overflow: hidden;
-    }
+}
+.event-block .edit-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 12px;
+  background: #ffffffaa;
+  border-radius: 50%;
+  padding: 2px 4px;
+  cursor: pointer;
+  display: none;
+}
+.event-block:hover .edit-btn {
+  display: block;
+}
+
+.edit-overlay {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 8px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.edit-overlay input,
+.edit-overlay textarea,
+.edit-overlay button {
+  font-size: 0.75rem;
+  padding: 4px 6px;
+}
 .event-block.general {
-  opacity: 0.9;                  /* etwas weniger transparent */
-  font-style: italic;            /* subtiler Hinweis */
+  opacity: 0.9;
+  font-style: italic;
 }
     .event-time {
       font-size: 0.7rem;
@@ -149,15 +180,36 @@
     }
 
     .member {
-      background: #ece3ff;
-      color: #923fbe;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      position: relative;
+  background: #ece3ff;
+  color: #923fbe;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
     }
+    .member .delete-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #a40000;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  display: none;
+  cursor: pointer;
+}
+
+.member:hover .delete-btn {
+  display: block;
+}
 
     .family-actions {
       display: flex;
@@ -183,14 +235,11 @@
     .reset-btn {
   background: #ffe3e3;
   color: #a40000;
-
   border: none;
   border-radius: 10px;
-
   padding: 6px 12px;
   font-size: 0.8rem;
   font-weight: 600;
-
   cursor: pointer;
 }
 
@@ -207,14 +256,12 @@
   width: 300px;
 }
 
-/* Mobile: unter die drei Buttons schieben */
 @media (max-width: 600px) {
   .week-dropdown {
     grid-column: 1 / -1;
     width: 100%;
   }
 }
-/* 📱 Mobile Ansicht */
 @media (max-width: 600px) {
   .nav-bar {
     display: grid;
@@ -230,18 +277,15 @@
     font-size: 0.55rem;
   }
 
-  /* Erste Zeile: die 3 Tabs */
   .nav-bar .nav-btn:not(.add-btn):not(.reset-btn) {
     grid-column: span 1;
   }
 
-  /* Zweite Zeile: + Termin */
   #add-event-btn {
     grid-column: 1 / -1;
     margin-left: 0;
   }
 
-  /* Dritte Zeile: Woche zurücksetzen */
   #reset-week-btn {
     grid-column: 1 / -1;
   }
@@ -253,7 +297,7 @@
   <div class="card">
     <header>
       <h1>Family Week Dashboard</h1>
-      <p>Plane eure Woche gemeinsam</p>
+      <p>Plant eure Woche gemeinsam!</p>
 
     </header>
     
@@ -261,7 +305,7 @@
     <div class="nav-bar">
       <button class="nav-btn">Wochenansicht</button>
       <button class="nav-btn">Auswertung</button>
-      <button class="nav-btn">Ideen</button>
+      <button class="nav-btn">Verbesserungsziel</button>
 
 
       <button class="nav-btn add-btn" id="add-event-btn">+ Termin</button>    
