@@ -4,95 +4,294 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Family Week Dashboard</title>
+
   <style>
-    /* ===== Grundlegendes Styling ===== */
-    * { box-sizing: border-box; margin:0; padding:0; font-family:"Segoe UI", Arial, sans-serif; }
-    body { background: linear-gradient(180deg,#f7f3ff,#fff); padding:20px; color:#333; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
 
-    header { margin-bottom: 25px; }
-    header h1 { color: #5a00cc; font-size: 2rem; margin-bottom:4px; }
-    header p { color: #8a6cff; margin-bottom:15px; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f7f3ff, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
 
-    .nav-bar { display:flex; align-items:center; gap:15px; flex-wrap:wrap; }
-    .nav-btn { border:none; background:none; color:#5a00cc; font-weight:600; cursor:pointer; padding:6px 10px; border-radius:20px; }
-    .nav-btn.active { background:#7a1cff; color:#fff; }
-    .add-btn { margin-left:auto; background:#7a1cff; color:white; border:none; padding:8px 16px; border-radius:20px; cursor:pointer; font-weight:600; }
+    .card {
+      background: white;
+      width: 95%;
+      max-width: 1100px;
+      padding: 24px;
+      border-radius: 18px;
+      box-shadow: 0 14px 40px rgba(90,0,204,0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
 
-    .calendar { background:white; border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.05); margin-bottom:25px; }
-.calendar-header,
-.calendar-body {
-  display: grid;
-  grid-template-columns: 80px repeat(7, 1fr);
+    header h1 {
+      color: #923fbe;
+      font-size: 1.8rem;
+    }
+
+    header p {
+      color: #905c9f;
+      margin-top: 4px;
+    }
+
+    .nav-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .nav-btn {
+      border: none;
+      background: #ece3ff;
+      color: #923fbe;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .add-btn {
+      margin-left: auto;
+      background: #844aa3;
+      color: white;
+    }
+
+    .calendar {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+
+    .calendar-header,
+    .calendar-body {
+      display: grid;
+      grid-template-columns: 80px repeat(7, 1fr);
+    }
+
+    .calendar-header {
+      background: #f3ecff;
+      font-weight: 600;
+      color: #923fbe;
+    }
+
+    .calendar-header div {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #e5d9ff;
+    }
+
+    .calendar-body {
+      grid-auto-rows: 50px;
+    }
+
+    .time {
+      padding: 8px;
+      font-size: 0.8rem;
+      color: #905c9f;
+      border-bottom: 1px solid #f0ebff;
+    }
+
+    .cell {
+      border-bottom: 1px solid #f0ebff;
+      border-left: 1px solid #f0ebff;
+    }
+
+    .event-block {
+      position: absolute;
+      border-radius: 8px;
+      padding: 4px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600; 
+      color: #000 !important;
+        opacity: 0.82;                 /* ✨ transparenter */
+  backdrop-filter: saturate(1.2);
+
+  overflow: hidden;
+    }
+.event-block.general {
+  opacity: 0.9;                  /* etwas weniger transparent */
+  font-style: italic;            /* subtiler Hinweis */
 }
+    .event-time {
+      font-size: 0.7rem;
+      font-weight: 400;
+      margin-top: 2px;
+      opacity: 0.85;
+    }
 
-.calendar-header {
-  background: #f3ecff;
+    .family-box h2 {
+      color: #923fbe;
+      margin-bottom: 8px;
+    }
+
+    .members {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .member {
+      background: #ece3ff;
+      color: #923fbe;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .family-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .family-actions input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+    }
+
+    .family-actions button {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      background: #844aa3;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .reset-btn {
+  background: #ffe3e3;
+  color: #a40000;
+
+  border: none;
+  border-radius: 10px;
+
+  padding: 6px 12px;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #5a00cc;
+
+  cursor: pointer;
 }
 
-.calendar-header div {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 1px solid #e5d9ff;
+.reset-btn:hover {
+  background: #ffcccc;
+}
+.week-dropdown {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 4px 8px;
+  color: #333;
+  font-weight: 600;
+  width: 300px;
 }
 
-.calendar-body {
-  grid-auto-rows: 50px;
+/* Mobile: unter die drei Buttons schieben */
+@media (max-width: 600px) {
+  .week-dropdown {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
 }
+/* 📱 Mobile Ansicht */
+@media (max-width: 600px) {
+  .nav-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+    .event-block {
+    font-size: 0.65rem;
+    line-height: 1.1;
+  }
 
-.time {
-  padding: 10px;
-  font-size: 0.85rem;
-  color: #8a6cff;
-  border-bottom: 1px solid #f0ebff;
+  .event-time {
+    font-size: 0.55rem;
+  }
+
+  /* Erste Zeile: die 3 Tabs */
+  .nav-bar .nav-btn:not(.add-btn):not(.reset-btn) {
+    grid-column: span 1;
+  }
+
+  /* Zweite Zeile: + Termin */
+  #add-event-btn {
+    grid-column: 1 / -1;
+    margin-left: 0;
+  }
+
+  /* Dritte Zeile: Woche zurücksetzen */
+  #reset-week-btn {
+    grid-column: 1 / -1;
+  }
 }
-
-.cell {
-  border-bottom: 1px solid #f0ebff;
-  border-left: 1px solid #f0ebff;
-}
-    .family-box { background:white; padding:18px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
-    .family-box h2 { margin-bottom:12px; color:#5a00cc; }
-    .members { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
-    .member { background:#ece3ff; padding:6px 14px; border-radius:20px; font-size:0.9rem; color:#5a00cc; }
-    .family-box input { padding:8px; width:200px; border-radius:8px; border:1px solid #ddd; }
-    .family-box button { padding:8px 12px; margin-left:6px; border-radius:8px; border:none; background:#7a1cff; color:white; cursor:pointer; }
-
-    /* ===== Responsive ===== */
-    
-    @media (max-width: 600px){
-  .calendar-header div {
-    font-size: 0.8rem;
-    padding: 8px 4px; }}
-
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>Family Week Dashboard</h1>
-    <p>Plane eure Woche gemeinsam</p>
+  <div class="card">
+    <header>
+      <h1>Family Week Dashboard</h1>
+      <p>Plane eure Woche gemeinsam</p>
+
+    </header>
+    
+
     <div class="nav-bar">
-      <button class="nav-btn active">Wochenansicht</button>
-      <button class="nav-btn">Wochen-Auswertung</button>
-      <button class="nav-btn">Ideen für nächste Woche</button>
-      <button class="add-btn">+ Termin hinzufügen</button>
+      <button class="nav-btn">Wochenansicht</button>
+      <button class="nav-btn">Auswertung</button>
+      <button class="nav-btn">Ideen</button>
+
+
+      <button class="nav-btn add-btn" id="add-event-btn">+ Termin</button>    
+      <button id="reset-week-btn" class="reset-btn">
+  Woche zurücksetzen
+</button>     
+
     </div>
-  </header>
+ <select id="week-select" class="week-dropdown">
+  <option value="1">Woche 1</option>
+  <option value="2">Woche 2</option>
+  <option value="3">Woche 3</option>
+  <option value="4">Woche 4</option>
+  <option value="5">Woche 5</option>
+  <option value="6">Woche 6</option>
+  <option value="7">Woche 7</option>
+</select>
 
-  <!-- Kalender Container -->
-  <section class="calendar" id="calendar"></section>
+    <div class="calendar" id="calendar"></div>
 
-  <!-- Familienmitglieder -->
-  <section class="family-box">
-    <h2>Familienmitglieder</h2>
-    <div class="members" id="members-container"></div>
-    <input type="text" placeholder="Name hinzufügen" id="member-input">
-    <button id="add-member-btn">Hinzufügen</button>
-  </section>
+    <div class="family-box">
+      <h2>Familienmitglieder</h2>
+      <div class="members" id="members-container"></div>
+      <div class="family-actions">
+        <input id="member-input" placeholder="Name hinzufügen">
+        <button id="add-member-btn">Hinzufügen</button>
 
+      </div>
+    </div>
+  </div>
   <script src="dist/main.js"></script>
-  
 </body>
 </html>
