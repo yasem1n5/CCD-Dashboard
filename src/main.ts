@@ -1,6 +1,9 @@
 const GENERAL_MEMBER = "allgemein";
 const GENERAL_COLOR = "#bdbdbd";
 
+const MIN_TIME = 6.5;
+const MAX_TIME = 23;
+
 const TOTAL_WEEKS = 7;
 
 function removeMemberFromAllWeeks(memberName: string) {
@@ -31,6 +34,9 @@ const days: { key: Day; label: string }[] = [
   { key: "Sat", label: "Sa" },
   { key: "Sun", label: "So" }
 ];
+
+const legendContainer = document.getElementById("legend-container");
+
 
 const colors = ["#e763cf","#85a8d5","#6bba89","#c5b27b","#a473c4"];
 const memberColors: Record<string,string> = {};
@@ -197,7 +203,7 @@ function renderMembers() {
       calendar.appendChild(block);
 
       // Doppelklick → Popup zum Bearbeiten
-      block.addEventListener("dblclick", () => {
+      block.addEventListener("click", () => {
         const overlay = document.createElement("div");
         overlay.className = "edit-overlay";
         overlay.style.position = "fixed";
@@ -250,16 +256,21 @@ const contentInput = overlay.querySelector<HTMLTextAreaElement>("textarea")!;
         saveBtn.addEventListener("click", () => {
           const startArr = startInput.value.split(":").map(Number);
           const endArr = endInput.value.split(":").map(Number);
-          if (startArr.length !== 2 || endArr.length !== 2 || !contentInput.value.trim()) {
-            alert("Bitte alles ausfüllen");
-            return;
-          }
-          const startTime = startArr[0] + startArr[1]/60;
-          const endTime = endArr[0] + endArr[1]/60;
-          if (startTime >= endTime) {
-            alert("Startzeit muss vor Endzeit liegen");
-            return;
-          }
+          if (startArr.length !== 2 || endArr.length !== 2) {
+  alert("Bitte Start- und Endzeit ausfüllen");
+  return;
+}
+          const startTime = startArr[0] + startArr[1] / 60;
+const endTime   = endArr[0]   + endArr[1]   / 60;
+
+if (
+  startTime < MIN_TIME ||
+  endTime > MAX_TIME ||
+  startTime >= endTime
+) {
+  alert("Zeiten müssen zwischen 06:30 und 23:00 liegen.");
+  return;
+}
 
           ev.start = startTime;
           ev.end = endTime;
@@ -358,19 +369,23 @@ if (document.getElementById("member-select")) {
   saveBtn.addEventListener("click", () => {
     const startArr = startInput.value.split(":").map(Number);
     const endArr = endInput.value.split(":").map(Number);
-    if (startArr.length !== 2 || endArr.length !== 2 || !contentInput.value.trim()) {
-      alert("Bitte alles ausfüllen");
-      return;
-    }
+    if (startArr.length !== 2 || endArr.length !== 2) {
+  alert("Bitte Start- und Endzeit ausfüllen");
+  return;
+}
     const startTime = startArr[0] + startArr[1]/60;
     const endTime = endArr[0] + endArr[1]/60;
-    if (startTime >= endTime) {
-      alert("Startzeit muss vor Endzeit liegen");
-      return;
-    }
+    if (
+  startTime < MIN_TIME ||
+  endTime > MAX_TIME ||
+  startTime >= endTime
+) {
+  alert("Zeiten müssen zwischen 06:30 und 23:00 liegen.");
+  return;
+}
 
     const selectedCategories = Array.from(categoryContainer.querySelectorAll<HTMLInputElement>('input:checked'))
-                                   .map(cb => cb.value);
+    .map(cb => cb.value);
 
     events.push({
       member: memberSelect.value,
