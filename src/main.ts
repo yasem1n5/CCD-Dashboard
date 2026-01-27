@@ -42,7 +42,7 @@ const colors = ["#e763cf","#85a8d5","#6bba89","#c5b27b","#a473c4"];
 const memberColors: Record<string,string> = {};
 
 // Kategorien
-const categories = ["Sport", "Drinnen", "Draußen", "Kreativ", "Entspannung", "Lernen", "Familie"];
+const categories = ["Sport", "Lernen", "Handyzeit", "Erholung", "Familie", "Projektarbeit", "Hausaufgaben", "Videospiele"];
 
 // ---------- LocalStorage ----------
 // Mitglieder
@@ -65,6 +65,7 @@ function formatTime(t: number) {
 }
 
 // ================= INDEX.HTML =================
+
 if (document.getElementById("calendar")) {
 
   const calendar = document.getElementById("calendar")!;
@@ -78,6 +79,19 @@ if (document.getElementById("calendar")) {
   let currentWeek = parseInt(localStorage.getItem("currentWeek") || "1");
   let events: EventItem[] = loadWeekEvents(currentWeek);
   const members = loadMembers();
+const auswertungBtn = document.getElementById("go-auswertung");
+const verbesserungBtn = document.getElementById("go-verbesserung");
+
+auswertungBtn?.addEventListener("click", () => {
+  localStorage.setItem("currentWeek", currentWeek.toString());
+  window.location.href = "auswertung.html";
+});
+
+verbesserungBtn?.addEventListener("click", () => {
+  localStorage.setItem("currentWeek", currentWeek.toString());
+  window.location.href = "verbesserung.html";
+});
+
 
   // ---------- Reset Woche ----------  
   resetBtn.addEventListener("click", () => {
@@ -402,5 +416,43 @@ if (document.getElementById("member-select")) {
 
   backBtn.addEventListener("click", () => {
     window.location.href = "index.html";
+  });
+}
+
+// ================= AUSWERTUNG.HTML =================
+if (document.getElementById("auswertung-page")) {
+  const indexBtn = document.getElementById("go-index");
+  const auswertungBtn = document.getElementById("go-auswertung");
+  const verbesserungBtn = document.getElementById("go-verbesserung");
+
+  indexBtn?.addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+
+  auswertungBtn?.addEventListener("click", () => {
+    window.location.href = "auswertung.html";
+  });
+
+  verbesserungBtn?.addEventListener("click", () => {
+    window.location.href = "verbesserung.html";
+  });
+}
+
+// ================= VERBESSERUNG.HTML =================
+if (document.getElementById("go-index") && !document.getElementById("calendar") && !document.getElementById("auswertung-page")) {
+  const indexBtn = document.getElementById("go-index");
+  const auswertungBtn = document.getElementById("go-auswertung");
+  const verbesserungBtn = document.getElementById("go-verbesserung");
+
+  indexBtn?.addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+
+  auswertungBtn?.addEventListener("click", () => {
+    window.location.href = "auswertung.html";
+  });
+
+  verbesserungBtn?.addEventListener("click", () => {
+    window.location.href = "verbesserung.html";
   });
 }

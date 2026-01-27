@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Family Week Dashboard</title>
+  <title>Weekly Planner</title>
 
   <style>
     * {
@@ -427,16 +427,16 @@
 <body>
   <div class="card">
     <header>
-      <h1>Family Week Dashboard</h1>
+      <h1>Weekly Planner</h1>
       <p>Plant eure Woche gemeinsam!</p>
 
     </header>
     
 
     <div class="nav-bar">
-      <button class="nav-btn">Wochenansicht</button>
-      <button class="nav-btn">Auswertung</button>
-      <button class="nav-btn">Verbesserungsziel</button>
+      <button class="nav-btn" id="go-index">Wochenansicht</button>
+      <button class="nav-btn" id="go-auswertung">Auswertung</button>
+      <button class="nav-btn" id="go-verbesserung">Verbesserungsziel</button>
 
 
       <button class="nav-btn add-btn" id="add-event-btn">+ Termin</button>    
@@ -462,7 +462,7 @@
   <div class="calendar" id="calendar"></div>
 
   <div class="calendar-legend">
-    <h3>Familienmitglieder</h3>
+    <h3>Mitglieder</h3>
     
     <div id="legend-container"> <div class="members" id="members-container"></div></div>
     <div class="family-box">

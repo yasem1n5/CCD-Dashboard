@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weekly Planner</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f7f3ff, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+
+
+
+    .card {
+      background: white;
+      width: 95%;
+      max-width: 1300px;
+      padding: 24px;
+      border-radius: 18px;
+      box-shadow: 0 14px 40px rgba(90,0,204,0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    header h1 {
+      color: #923fbe;
+      font-size: 1.8rem;
+    }
+
+    header p {
+      color: #905c9f;
+      margin-top: 4px;
+    }
+
+    .nav-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .nav-btn {
+      border: none;
+      background: #ece3ff;
+      color: #923fbe;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .add-btn {
+      margin-left: auto;
+      background: #844aa3;
+      color: white;
+    }
+
+    
+    .time {
+      padding: 8px;
+      font-size: 0.8rem;
+      color: #905c9f;
+      border-bottom: 1px solid #f0ebff;
+    }
+
+    .cell {
+      border-bottom: 1px solid #f0ebff;
+      border-left: 1px solid #f0ebff;
+    }
+
+
+    .family-box h2 {
+      color: #923fbe;
+      margin-bottom: 8px;
+    }
+
+
+    .family-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .family-actions input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+    }
+
+    .family-actions button {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      background: #844aa3;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .reset-btn {
+  background: #ffe3e3;
+  color: #a40000;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reset-btn:hover {
+  background: #ffcccc;
+}
+.week-dropdown {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 4px 8px;
+  color: #333;
+  font-weight: 600;
+  width: 300px;
+}
+
+@media (max-width: 700px) {
+  .calendar-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .week-dropdown {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+@media (max-width: 600px) {
+  .nav-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+    .event-block {
+    font-size: 0.65rem;
+    line-height: 1.1;
+  }
+
+  .event-time {
+    font-size: 0.55rem;
+  }
+
+  .nav-bar .nav-btn:not(.add-btn):not(.reset-btn) {
+    grid-column: span 1;
+  }
+
+  #add-event-btn {
+    grid-column: 1 / -1;
+    margin-left: 0;
+  }
+
+  #reset-week-btn {
+    grid-column: 1 / -1;
+  }
+}
+  </style>
+</head>
+
+<body id="auswertung-page">
+  <div class="card">
+    <header>
+      <h1>Weekly Planner</h1>
+      <p>Plant eure Woche gemeinsam!</p>
+
+    </header>
+    
+
+    <div class="nav-bar">
+      <button class="nav-btn" id="go-index">Wochenansicht</button>
+      <button class="nav-btn" id="go-auswertung">Auswertung</button>
+      <button class="nav-btn" id="go-verbesserung">Verbesserungsziel</button>
+    </div>
+    
+ <select id="week-select" class="week-dropdown">
+  <option value="1">Woche 1</option>
+  <option value="2">Woche 2</option>
+  <option value="3">Woche 3</option>
+  <option value="4">Woche 4</option>
+  <option value="5">Woche 5</option>
+  <option value="6">Woche 6</option>
+  <option value="7">Woche 7</option>
+</select>
+
+</div>
+  <script src="dist/main.js"></script>
+</body>
+</html>

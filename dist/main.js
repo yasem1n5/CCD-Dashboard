@@ -23,7 +23,7 @@ const legendContainer = document.getElementById("legend-container");
 const colors = ["#e763cf", "#85a8d5", "#6bba89", "#c5b27b", "#a473c4"];
 const memberColors = {};
 // Kategorien
-const categories = ["Sport", "Drinnen", "Draußen", "Kreativ", "Entspannung", "Lernen", "Familie"];
+const categories = ["Sport", "Lernen", "Handyzeit", "Erholung", "Familie", "Projektarbeit", "Hausaufgaben", "Videospiele"];
 // ---------- LocalStorage ----------
 // Mitglieder
 const loadMembers = () => JSON.parse(localStorage.getItem("members") || "[]");
@@ -49,6 +49,16 @@ if (document.getElementById("calendar")) {
     let currentWeek = parseInt(localStorage.getItem("currentWeek") || "1");
     let events = loadWeekEvents(currentWeek);
     const members = loadMembers();
+    const auswertungBtn = document.getElementById("go-auswertung");
+    const verbesserungBtn = document.getElementById("go-verbesserung");
+    auswertungBtn === null || auswertungBtn === void 0 ? void 0 : auswertungBtn.addEventListener("click", () => {
+        localStorage.setItem("currentWeek", currentWeek.toString());
+        window.location.href = "auswertung.html";
+    });
+    verbesserungBtn === null || verbesserungBtn === void 0 ? void 0 : verbesserungBtn.addEventListener("click", () => {
+        localStorage.setItem("currentWeek", currentWeek.toString());
+        window.location.href = "verbesserung.html";
+    });
     // ---------- Reset Woche ----------  
     resetBtn.addEventListener("click", () => {
         const ok = confirm(`Willst du die komplette Woche ${currentWeek} zurücksetzen?\n\n` +
@@ -327,5 +337,35 @@ if (document.getElementById("member-select")) {
     });
     backBtn.addEventListener("click", () => {
         window.location.href = "index.html";
+    });
+}
+// ================= AUSWERTUNG.HTML =================
+if (document.getElementById("auswertung-page")) {
+    const indexBtn = document.getElementById("go-index");
+    const auswertungBtn = document.getElementById("go-auswertung");
+    const verbesserungBtn = document.getElementById("go-verbesserung");
+    indexBtn === null || indexBtn === void 0 ? void 0 : indexBtn.addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
+    auswertungBtn === null || auswertungBtn === void 0 ? void 0 : auswertungBtn.addEventListener("click", () => {
+        window.location.href = "auswertung.html";
+    });
+    verbesserungBtn === null || verbesserungBtn === void 0 ? void 0 : verbesserungBtn.addEventListener("click", () => {
+        window.location.href = "verbesserung.html";
+    });
+}
+// ================= VERBESSERUNG.HTML =================
+if (document.getElementById("go-index") && !document.getElementById("calendar") && !document.getElementById("auswertung-page")) {
+    const indexBtn = document.getElementById("go-index");
+    const auswertungBtn = document.getElementById("go-auswertung");
+    const verbesserungBtn = document.getElementById("go-verbesserung");
+    indexBtn === null || indexBtn === void 0 ? void 0 : indexBtn.addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
+    auswertungBtn === null || auswertungBtn === void 0 ? void 0 : auswertungBtn.addEventListener("click", () => {
+        window.location.href = "auswertung.html";
+    });
+    verbesserungBtn === null || verbesserungBtn === void 0 ? void 0 : verbesserungBtn.addEventListener("click", () => {
+        window.location.href = "verbesserung.html";
     });
 }
