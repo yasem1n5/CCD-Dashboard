@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Weekly Planner</title>
@@ -18,7 +19,8 @@
       background: linear-gradient(180deg, #f7f3ff, #ffffff);
       display: flex;
       justify-content: center;
-      align-items: center;
+            align-items: flex-start;
+padding-top: 45px;
       color: #333;
     }
 
@@ -133,6 +135,216 @@
   font-weight: 600;
   width: 300px;
 }
+.week-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.week-btn {
+  border: none;
+  background: #ece3ff;
+  color: #923fbe;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.week-btn.active {
+  background: #844aa3;
+  color: white;
+}
+/* CHARTS */
+.charts-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.chart-box {
+  background: #faf7ff;
+  padding: 18px;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px #eee;
+}
+
+.chart-box h2 {
+  color: #923fbe;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+#activityChart {
+  width: 100% !important;
+  height: 300px !important;
+}
+
+#lifeChart {
+  max-width: 100%;
+  height: 320px !important;
+}
+
+/*members*/
+.member-overview-title {
+  margin-top: 30px;
+  margin-bottom: 14px;
+  color: #923fbe;
+  font-size: 1.2rem;
+}
+
+.member-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.member-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 22px rgba(146, 63, 190, 0.12);
+  border: 1px solid #eee;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(146, 63, 190, 0.18);
+}
+
+.member-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.member-metric {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
+.metric-label {
+  color: #777;
+}
+
+.metric-value {
+  font-weight: 700;
+}
+
+.metric-focus {
+  color: #923fbe;
+}
+
+.metric-freetime {
+  color: #2e9f7f;
+}
+
+/* ================= SUMMARY CARDS – HELLES LILA ================= */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.summary-card {
+  background: linear-gradient(
+    180deg,
+    #f7f3ff 0%,
+    #efe7ff 100%
+  );
+
+  border-radius: 18px;
+  padding: 16px 18px;
+  border: 1px solid #e5d9ff;
+
+  box-shadow: 0 10px 26px rgba(146, 63, 190, 0.14);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(146, 63, 190, 0.2);
+}
+
+.summary-card::before {
+  content: "";
+  width: 38px;
+  height: 4px;
+  border-radius: 4px;
+  background: #923fbe;
+  margin-bottom: 10px;
+}
+
+.summary-card .label {
+  font-size: 0.75rem;
+  color: #cec5d6;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-card .value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #923fbe;
+  margin-top: 6px;
+  line-height: 1.2;
+}
+
+.summary-card .sub {
+  font-size: 0.75rem;
+  color: #c4b9d0;
+  margin-top: 4px;
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+  .summary-card {
+    padding: 14px;
+  }
+
+  .summary-card .value {
+    font-size: 1.6rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 800px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 @media (max-width: 700px) {
   .calendar-wrapper {
@@ -202,7 +414,28 @@
   <option value="7">Woche 7</option>
 </select>
 
+<div id="summary-cards" class="summary-grid"></div>
+
+<div class="charts-container">
+
+  <div class="chart-box">
+    <h2>Aktivitätsdiagramm</h2>
+    <canvas id="activityChart"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <h2>Zeitverteilung nach Lebensbereichen</h2>
+    <canvas id="lifeChart"></canvas>
+  </div>
 </div>
+<h2 class="member-overview-title">Übersicht pro Familienmitglied</h2>
+
+<div class="member-cards" id="member-cards"></div>
+
+
+
+</div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="dist/main.js"></script>
 </body>
 </html>

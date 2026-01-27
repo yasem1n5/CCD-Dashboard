@@ -1,4 +1,4 @@
-const GENERAL_MEMBER = "allgemein";
+const GENERAL_MEMBER = "gemeinsame zeit";
 const GENERAL_COLOR = "#bdbdbd";
 const MIN_TIME = 6.5;
 const MAX_TIME = 23;
@@ -120,7 +120,7 @@ if (document.getElementById("calendar")) {
       background:${GENERAL_COLOR};
       display:inline-block;
     "></span>
-    Allgemein
+    Gemeinsame Zeit
   `;
         membersContainer.appendChild(generalDiv);
     }
@@ -153,9 +153,9 @@ if (document.getElementById("calendar")) {
             block.style.top = `${(ev.start - 6) * 50 + 38}px`;
             block.style.height = `${(ev.end - ev.start) * 50}px`;
             block.style.width = `${dayWidth}px`;
-            block.style.background = ev.member === "allgemein" ? "#d3d3d3" : memberColors[ev.member];
+            block.style.background = ev.member === GENERAL_MEMBER ? "#d3d3d3" : memberColors[ev.member];
             block.style.color = "#000";
-            if (ev.member === "allgemein")
+            if (ev.member === GENERAL_MEMBER)
                 block.classList.add("general");
             // Kategorien als Titel
             block.innerHTML = `
@@ -340,10 +340,115 @@ if (document.getElementById("member-select")) {
     });
 }
 // ================= AUSWERTUNG.HTML =================
+function calculateFocusAndFreetime(events) {
+    let fokus = 0;
+    let freizeit = 0;
+    let total = 0;
+    events.forEach(ev => {
+        const duration = ev.end - ev.start;
+        total += duration;
+        if (ev.categories.includes("Lernen") ||
+            ev.categories.includes("Projektarbeit") ||
+            ev.categories.includes("Hausaufgaben")) {
+            fokus += duration;
+        }
+        if (ev.categories.includes("Sport") ||
+            ev.categories.includes("Erholung") ||
+            ev.categories.includes("Familie")) {
+            freizeit += duration;
+        }
+    });
+    return {
+        fokus: Math.round(fokus * 10) / 10,
+        freizeitPercent: total > 0 ? Math.round((freizeit / total) * 100) : 0
+    };
+}
+function renderSummaryCards(week) {
+    var _a;
+    const container = document.getElementById("summary-cards");
+    if (!container)
+        return;
+    const events = loadWeekEvents(week);
+    let gemeinsameZeit = 0;
+    const aktivProTag = {};
+    let fokus = 0;
+    let gesamt = 0;
+    events.forEach(ev => {
+        const duration = ev.end - ev.start;
+        gesamt += duration;
+        if (ev.member === GENERAL_MEMBER) {
+            gemeinsameZeit += duration;
+        }
+        aktivProTag[ev.day] = (aktivProTag[ev.day] || 0) + duration;
+        if (ev.categories.includes("Lernen") ||
+            ev.categories.includes("Projektarbeit") ||
+            ev.categories.includes("Hausaufgaben")) {
+            fokus += duration;
+        }
+    });
+    const aktivsterTag = ((_a = Object.entries(aktivProTag).sort((a, b) => b[1] - a[1])[0]) === null || _a === void 0 ? void 0 : _a[0]) || "-";
+    const fokusAnteil = gesamt > 0 ? Math.round((fokus / gesamt) * 100) : 0;
+    container.innerHTML = `
+    <div class="summary-card purple">
+      <div>Gemeinsame Zeit</div>
+      <div class="value">${gemeinsameZeit.toFixed(1)} h</div>
+    </div>
+
+    <div class="summary-card pink">
+      <div>Aktivitäten</div>
+      <div class="value">${events.length}</div>
+    </div>
+
+    <div class="summary-card green">
+      <div>Ø Fokus-Anteil</div>
+      <div class="value">${fokusAnteil} %</div>
+    </div>
+
+    <div class="summary-card orange">
+      <div>Aktivster Tag</div>
+      <div class="value">${aktivsterTag}</div>
+    </div>
+  `;
+}
+function renderMemberCards(week) {
+    const container = document.getElementById("member-cards");
+    if (!container)
+        return;
+    container.innerHTML = "";
+    const members = loadMembers();
+    const events = loadWeekEvents(week);
+    members.forEach((member, index) => {
+        const memberEvents = events.filter(e => e.member === member);
+        const stats = calculateFocusAndFreetime(memberEvents);
+        const color = colors[index % colors.length];
+        const card = document.createElement("div");
+        card.className = "member-card";
+        card.innerHTML = `
+      <div class="member-header">
+        <div class="member-avatar" style="background:${color}">
+          ${member.charAt(0).toUpperCase()}
+        </div>
+        <div class="member-name">${member}</div>
+      </div>
+
+      <div class="member-metric">
+        <span class="metric-label">Fokuszeit</span>
+        <span class="metric-focus">${stats.fokus}h</span>
+      </div>
+
+      <div class="member-metric">
+        <span class="metric-label">Freizeitanteil</span>
+        <span class="metric-freetime">${stats.freizeitPercent}%</span>
+      </div>
+    `;
+        container.appendChild(card);
+    });
+}
 if (document.getElementById("auswertung-page")) {
     const indexBtn = document.getElementById("go-index");
     const auswertungBtn = document.getElementById("go-auswertung");
     const verbesserungBtn = document.getElementById("go-verbesserung");
+    const weekSelect = document.getElementById("week-select");
     indexBtn === null || indexBtn === void 0 ? void 0 : indexBtn.addEventListener("click", () => {
         window.location.href = "index.html";
     });
@@ -352,6 +457,118 @@ if (document.getElementById("auswertung-page")) {
     });
     verbesserungBtn === null || verbesserungBtn === void 0 ? void 0 : verbesserungBtn.addEventListener("click", () => {
         window.location.href = "verbesserung.html";
+    });
+    let activityChart = null;
+    let lifeChart = null;
+    // Chart data calculation
+    function calculateChartData(week) {
+        const events = loadWeekEvents(week);
+        const categoryHours = {};
+        categories.forEach(cat => categoryHours[cat] = 0);
+        events.forEach(ev => {
+            const duration = ev.end - ev.start;
+            ev.categories.forEach(cat => {
+                if (categoryHours[cat] !== undefined) {
+                    categoryHours[cat] += duration;
+                }
+            });
+        });
+        const freizeit = (categoryHours["Sport"] || 0) +
+            (categoryHours["Erholung"] || 0) +
+            (categoryHours["Familie"] || 0);
+        const medien = (categoryHours["Handyzeit"] || 0) +
+            (categoryHours["Videospiele"] || 0);
+        const schulisch = (categoryHours["Lernen"] || 0) +
+            (categoryHours["Projektarbeit"] || 0) +
+            (categoryHours["Hausaufgaben"] || 0);
+        const total = freizeit + medien + schulisch;
+        return {
+            activity: {
+                labels: ["Sport", "Lernen", "Handyzeit", "Erholung", "Familie"],
+                data: [
+                    categoryHours["Sport"] || 0,
+                    categoryHours["Lernen"] || 0,
+                    categoryHours["Handyzeit"] || 0,
+                    categoryHours["Erholung"] || 0,
+                    categoryHours["Familie"] || 0
+                ]
+            },
+            life: total > 0
+                ? [
+                    Math.round((freizeit / total) * 100),
+                    Math.round((medien / total) * 100),
+                    Math.round((schulisch / total) * 100)
+                ]
+                : [0, 0, 0]
+        };
+    }
+    // Render charts
+    function renderCharts(week) {
+        const data = calculateChartData(week);
+        // Alte Charts entfernen
+        if (activityChart)
+            activityChart.destroy();
+        if (lifeChart)
+            lifeChart.destroy();
+        // 🟣 Aktivitätsdiagramm (Säulen)
+        const activityCtx = document.getElementById("activityChart").getContext("2d");
+        activityChart = new Chart(activityCtx, {
+            type: "bar",
+            data: {
+                labels: data.activity.labels,
+                datasets: [{
+                        data: data.activity.data,
+                        backgroundColor: "#923fbe"
+                    }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: "Stunden" }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+        // 🟣 Lebensbereiche (Kreisdiagramm)
+        const lifeCtx = document.getElementById("lifeChart").getContext("2d");
+        lifeChart = new Chart(lifeCtx, {
+            type: "doughnut",
+            cutout: "55%",
+            data: {
+                labels: ["Freizeit", "Medien", "Schulisch"],
+                datasets: [{
+                        data: data.life,
+                        backgroundColor: ["#b57edc", "#6fa8dc", "#f6b26b"],
+                        borderColor: "#fff",
+                        borderWidth: 2
+                    }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" }
+                }
+            }
+        });
+    }
+    // Initialize
+    let currentWeek = parseInt(localStorage.getItem("currentWeek") || "1");
+    weekSelect.value = currentWeek.toString();
+    renderCharts(currentWeek);
+    renderMemberCards(currentWeek);
+    renderSummaryCards(currentWeek);
+    weekSelect.addEventListener("change", () => {
+        currentWeek = parseInt(weekSelect.value);
+        localStorage.setItem("currentWeek", currentWeek.toString());
+        renderCharts(currentWeek);
+        renderMemberCards(currentWeek);
+        renderSummaryCards(currentWeek);
     });
 }
 // ================= VERBESSERUNG.HTML =================
