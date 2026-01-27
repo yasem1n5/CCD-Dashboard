@@ -51,3 +51,29 @@ button {
   cursor: pointer;
   margin-top: 8px;        /* Optional: etwas Abstand über Button */
 }
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+}
+
+.avatar.selected {
+  border-color: #923fbe;
+}
+
+.member-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #923fbe;
+}

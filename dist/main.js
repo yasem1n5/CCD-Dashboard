@@ -11,10 +11,34 @@ const isAuthPage = location.pathname.includes("login") ||
 if (!currentUser && !isAuthPage) {
     window.location.href = "login.html";
 }
+const AVATARS = Array.from({ length: 10 }, (_, i) => `avatar${i + 1}`);
+let selectedAvatar = AVATARS[0];
 // ======== LOGIN ========
 const loginBtn = document.getElementById("login-btn");
 const isLoginPage = document.getElementById("login-btn") !== null;
 const isRegisterPage = document.getElementById("register-btn") !== null;
+// ======== AVATAR AUSWAHL (REGISTER) ========
+if (isRegisterPage) {
+    const avatarGrid = document.getElementById("register-avatar-grid");
+    if (avatarGrid) {
+        avatarGrid.innerHTML = "";
+        AVATARS.forEach((av, index) => {
+            const img = document.createElement("img");
+            img.src = `avatars/${av}.png`;
+            img.className = "avatar";
+            if (index === 0)
+                img.classList.add("selected");
+            img.addEventListener("click", () => {
+                document
+                    .querySelectorAll(".avatar")
+                    .forEach(a => a.classList.remove("selected"));
+                img.classList.add("selected");
+                selectedAvatar = av;
+            });
+            avatarGrid.appendChild(img);
+        });
+    }
+}
 if (isLoginPage && loginBtn) {
     loginBtn.addEventListener("click", () => {
         const name = document.getElementById("login-name").value.trim();
@@ -50,7 +74,11 @@ if (isRegisterPage && registerBtn) {
                 error.textContent = "Name existiert bereits";
             return;
         }
-        storedUsers.push({ name, password: pw1 });
+        storedUsers.push({
+            name,
+            password: pw1,
+            avatar: selectedAvatar
+        });
         localStorage.setItem("users", JSON.stringify(storedUsers));
         addUserAsMember(name);
         window.location.href = "login.html";
@@ -113,14 +141,14 @@ if (document.getElementById("calendar")) {
     let events = loadWeekEvents(currentWeek);
     const members = loadMembers();
     const auswertungBtn = document.getElementById("go-auswertung");
-    const verbesserungBtn = document.getElementById("go-verbesserung");
+    const profileBtn = document.getElementById("go-profile");
     auswertungBtn === null || auswertungBtn === void 0 ? void 0 : auswertungBtn.addEventListener("click", () => {
         localStorage.setItem("currentWeek", currentWeek.toString());
         window.location.href = "auswertung.html";
     });
-    verbesserungBtn === null || verbesserungBtn === void 0 ? void 0 : verbesserungBtn.addEventListener("click", () => {
+    profileBtn === null || profileBtn === void 0 ? void 0 : profileBtn.addEventListener("click", () => {
         localStorage.setItem("currentWeek", currentWeek.toString());
-        window.location.href = "verbesserung.html";
+        window.location.href = "profile.html";
     });
     // ---------- Gemeinsame Notizen ----------
     const sharedNotes = document.getElementById("shared-notes");
@@ -218,6 +246,7 @@ if (document.getElementById("calendar")) {
         calendar.querySelectorAll(".event-block").forEach(e => e.remove());
         const dayWidth = (calendar.clientWidth - 80) / 7 - 4;
         events.forEach((ev, index) => {
+            var _a;
             const dayIndex = days.findIndex(d => d.key === ev.day);
             if (!ev.categories)
                 ev.categories = [];
@@ -237,87 +266,106 @@ if (document.getElementById("calendar")) {
         <div class="event-time">${formatTime(ev.start)} – ${formatTime(ev.end)}</div>
       `;
             calendar.appendChild(block);
+            // 🔐 Berechtigung prüfen
+            const loggedInUser = (_a = localStorage.getItem("currentUser")) !== null && _a !== void 0 ? _a : "";
+            const canEdit = ev.member === GENERAL_MEMBER ||
+                ev.owner === loggedInUser;
             // Doppelklick → Popup zum Bearbeiten
-            block.addEventListener("click", () => {
-                const overlay = document.createElement("div");
-                overlay.className = "edit-overlay";
-                overlay.style.position = "fixed";
-                overlay.style.top = "50%";
-                overlay.style.left = "50%";
-                overlay.style.transform = "translate(-50%, -50%)";
-                overlay.style.background = "#fff";
-                overlay.style.border = "1px solid #ddd";
-                overlay.style.borderRadius = "12px";
-                overlay.style.padding = "12px";
-                overlay.style.zIndex = "1000";
-                overlay.style.boxShadow = "0 4px 12px rgba(0,0,0,0.25)";
-                overlay.style.minWidth = "260px";
-                overlay.innerHTML = `
+            // Doppelklick → Popup zum Bearbeiten
+            if (canEdit) {
+                block.addEventListener("click", () => {
+                    const overlay = document.createElement("div");
+                    overlay.className = "edit-overlay";
+                    overlay.style.position = "fixed";
+                    overlay.style.top = "50%";
+                    overlay.style.left = "50%";
+                    overlay.style.transform = "translate(-50%, -50%)";
+                    overlay.style.background = "#fff";
+                    overlay.style.border = "1px solid #ddd";
+                    overlay.style.borderRadius = "12px";
+                    overlay.style.padding = "12px";
+                    overlay.style.zIndex = "1000";
+                    overlay.style.boxShadow = "0 4px 12px rgba(0,0,0,0.25)";
+                    overlay.style.minWidth = "260px";
+                    overlay.innerHTML = `
           <label>Startzeit:</label>
           <input type="time" value="${formatTime(ev.start)}">
+
           <label>Endzeit:</label>
           <input type="time" value="${formatTime(ev.end)}">
+
           <label>Kategorien:</label>
-          <div id="edit-category-container" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;">
+          <div id="edit-category-container"
+               style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
             ${categories.map(cat => `
               <label style="display:flex;align-items:center;gap:4px;">
-                <input type="checkbox" value="${cat}" ${ev.categories.includes(cat) ? "checked" : ""}>
+                <input type="checkbox" value="${cat}"
+                  ${ev.categories.includes(cat) ? "checked" : ""}>
                 ${cat}
               </label>
             `).join("")}
           </div>
+
           <label>Inhalt:</label>
           <textarea>${ev.content}</textarea>
-          <div style="display:flex; gap:6px; margin-top:6px;">
-            <button class="save-btn" style="flex:1; background:#844aa3; color:white;">Speichern</button>
-            <button class="delete-entry-btn" style="flex:1; background:#a40000; color:white;">Löschen</button>
+
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button class="save-btn"
+              style="flex:1;background:#844aa3;color:white;">
+              Speichern
+            </button>
+            <button class="delete-entry-btn"
+              style="flex:1;background:#a40000;color:white;">
+              Löschen
+            </button>
           </div>
         `;
-                document.body.appendChild(overlay);
-                const timeInputs = overlay.querySelectorAll('input[type="time"]');
-                const startInput = timeInputs[0];
-                const endInput = timeInputs[1];
-                const contentInput = overlay.querySelector("textarea");
-                const saveBtn = overlay.querySelector(".save-btn");
-                const deleteBtn = overlay.querySelector(".delete-entry-btn");
-                const categoryInputs = overlay.querySelectorAll('#edit-category-container input');
-                // Speichern
-                saveBtn.addEventListener("click", () => {
-                    const startArr = startInput.value.split(":").map(Number);
-                    const endArr = endInput.value.split(":").map(Number);
-                    if (startArr.length !== 2 || endArr.length !== 2) {
-                        alert("Bitte Start- und Endzeit ausfüllen");
-                        return;
-                    }
-                    const startTime = startArr[0] + startArr[1] / 60;
-                    const endTime = endArr[0] + endArr[1] / 60;
-                    if (startTime < MIN_TIME ||
-                        endTime > MAX_TIME ||
-                        startTime >= endTime) {
-                        alert("Zeiten müssen zwischen 06:30 und 23:00 liegen.");
-                        return;
-                    }
-                    ev.start = startTime;
-                    ev.end = endTime;
-                    const newContent = contentInput.value.trim();
-                    if (newContent !== ev.content) {
-                        ev.content = newContent;
-                    }
-                    ev.categories = Array.from(categoryInputs).filter(cb => cb.checked).map(cb => cb.value);
-                    saveWeekEvents(currentWeek, events);
-                    overlay.remove();
-                    renderGrid();
-                    renderEvents();
+                    document.body.appendChild(overlay);
+                    const timeInputs = overlay.querySelectorAll('input[type="time"]');
+                    const startInput = timeInputs[0];
+                    const endInput = timeInputs[1];
+                    const contentInput = overlay.querySelector("textarea");
+                    const saveBtn = overlay.querySelector(".save-btn");
+                    const deleteBtn = overlay.querySelector(".delete-entry-btn");
+                    const categoryInputs = overlay.querySelectorAll('#edit-category-container input');
+                    saveBtn.addEventListener("click", () => {
+                        const startArr = startInput.value.split(":").map(Number);
+                        const endArr = endInput.value.split(":").map(Number);
+                        const startTime = startArr[0] + startArr[1] / 60;
+                        const endTime = endArr[0] + endArr[1] / 60;
+                        if (startTime < MIN_TIME ||
+                            endTime > MAX_TIME ||
+                            startTime >= endTime) {
+                            alert("Zeiten müssen zwischen 06:30 und 23:00 liegen.");
+                            return;
+                        }
+                        ev.start = startTime;
+                        ev.end = endTime;
+                        ev.content = contentInput.value.trim();
+                        ev.categories =
+                            Array.from(categoryInputs)
+                                .filter(cb => cb.checked)
+                                .map(cb => cb.value);
+                        saveWeekEvents(currentWeek, events);
+                        overlay.remove();
+                        renderGrid();
+                        renderEvents();
+                    });
+                    deleteBtn.addEventListener("click", () => {
+                        events.splice(index, 1);
+                        saveWeekEvents(currentWeek, events);
+                        overlay.remove();
+                        renderGrid();
+                        renderEvents();
+                    });
                 });
-                // Löschen
-                deleteBtn.addEventListener("click", () => {
-                    events.splice(index, 1);
-                    saveWeekEvents(currentWeek, events);
-                    overlay.remove();
-                    renderGrid();
-                    renderEvents();
-                });
-            });
+            }
+            else {
+                // 👁️ Nur ansehen
+                block.style.cursor = "default";
+                block.style.opacity = "0.6";
+                block.title = "Nur ansehen";
+            }
         });
     }
     // ---------- Member hinzufügen ----------
@@ -400,6 +448,7 @@ if (document.getElementById("member-select")) {
             member: memberSelect.value === "gemeinsame zeit"
                 ? "gemeinsame zeit"
                 : localStorage.getItem("currentUser"),
+            owner: localStorage.getItem("currentUser"), // 🔑 Besitzer
             day: daySelect.value,
             start: startTime,
             end: endTime,
@@ -419,6 +468,9 @@ function calculateFocusAndFreetime(events) {
     let freizeit = 0;
     let total = 0;
     events.forEach(ev => {
+        const currentUser = localStorage.getItem("currentUser");
+        const canEdit = ev.member === GENERAL_MEMBER ||
+            ev.owner === currentUser;
         const duration = ev.end - ev.start;
         total += duration;
         if (ev.categories.includes("Lernen") ||
@@ -486,12 +538,15 @@ function renderSummaryCards(week) {
 }
 function renderMemberCards(week) {
     const container = document.getElementById("member-cards");
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
     if (!container)
         return;
     container.innerHTML = "";
     const members = loadMembers();
     const events = loadWeekEvents(week);
     members.forEach((member, index) => {
+        const user = users.find(u => u.name === member);
+        const avatar = (user === null || user === void 0 ? void 0 : user.avatar) || "avatar1";
         const memberEvents = events.filter(e => e.member === member);
         const stats = calculateFocusAndFreetime(memberEvents);
         const color = colors[index % colors.length];
@@ -499,9 +554,11 @@ function renderMemberCards(week) {
         card.className = "member-card";
         card.innerHTML = `
       <div class="member-header">
-        <div class="member-avatar" style="background:${color}">
-          ${member.charAt(0).toUpperCase()}
-        </div>
+        <img
+  class="member-avatar"
+  src="avatars/${avatar}.png"
+  alt="${member}"
+/>
         <div class="member-name">${member}</div>
       </div>
 
@@ -521,7 +578,7 @@ function renderMemberCards(week) {
 if (document.getElementById("auswertung-page")) {
     const indexBtn = document.getElementById("go-index");
     const auswertungBtn = document.getElementById("go-auswertung");
-    const verbesserungBtn = document.getElementById("go-verbesserung");
+    const profileBtn = document.getElementById("go-profile");
     const weekSelect = document.getElementById("week-select");
     indexBtn === null || indexBtn === void 0 ? void 0 : indexBtn.addEventListener("click", () => {
         window.location.href = "index.html";
@@ -529,8 +586,8 @@ if (document.getElementById("auswertung-page")) {
     auswertungBtn === null || auswertungBtn === void 0 ? void 0 : auswertungBtn.addEventListener("click", () => {
         window.location.href = "auswertung.html";
     });
-    verbesserungBtn === null || verbesserungBtn === void 0 ? void 0 : verbesserungBtn.addEventListener("click", () => {
-        window.location.href = "verbesserung.html";
+    profileBtn === null || profileBtn === void 0 ? void 0 : profileBtn.addEventListener("click", () => {
+        window.location.href = "profile.html";
     });
     let activityChart = null;
     let lifeChart = null;
@@ -617,7 +674,7 @@ if (document.getElementById("auswertung-page")) {
                 labels: ["Freizeit", "Medien", "Schulisch"],
                 datasets: [{
                         data: data.life,
-                        backgroundColor: ["#b57edc", "#6fa8dc", "#f6b26b"],
+                        backgroundColor: ["#db7599", "#8bb2d7", "#f4c089"],
                         borderColor: "#fff",
                         borderWidth: 2
                     }]
@@ -645,18 +702,90 @@ if (document.getElementById("auswertung-page")) {
         renderSummaryCards(currentWeek);
     });
 }
-// ================= VERBESSERUNG.HTML =================
+// ================= PROFILE.HTML =================
 if (document.getElementById("go-index") && !document.getElementById("calendar") && !document.getElementById("auswertung-page")) {
     const indexBtn = document.getElementById("go-index");
     const auswertungBtn = document.getElementById("go-auswertung");
-    const verbesserungBtn = document.getElementById("go-verbesserung");
+    const profileBtn = document.getElementById("go-profile");
     indexBtn === null || indexBtn === void 0 ? void 0 : indexBtn.addEventListener("click", () => {
         window.location.href = "index.html";
     });
     auswertungBtn === null || auswertungBtn === void 0 ? void 0 : auswertungBtn.addEventListener("click", () => {
         window.location.href = "auswertung.html";
     });
-    verbesserungBtn === null || verbesserungBtn === void 0 ? void 0 : verbesserungBtn.addEventListener("click", () => {
-        window.location.href = "verbesserung.html";
+    profileBtn === null || profileBtn === void 0 ? void 0 : profileBtn.addEventListener("click", () => {
+        window.location.href = "profile.html";
     });
 }
+if (document.getElementById("profile-page")) {
+    initProfilePage();
+}
+function initProfilePage() {
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const currentUserName = localStorage.getItem("currentUser");
+    const error = document.getElementById("profile-error");
+    if (!currentUserName) {
+        window.location.href = "login.html";
+        return;
+    }
+    const userIndex = users.findIndex(u => u.name === currentUserName);
+    if (userIndex === -1)
+        return;
+    const user = users[userIndex];
+    const nameInput = document.getElementById("profile-name");
+    const pwInput = document.getElementById("profile-password");
+    const pwRepeatInput = document.getElementById("profile-password-repeat");
+    const saveBtn = document.getElementById("profile-save-btn");
+    const cancelBtn = document.getElementById("profile-cancel-btn");
+    const avatarGrid = document.getElementById("profile-avatar-grid");
+    // Daten anzeigen
+    nameInput.value = user.name;
+    selectedAvatar = user.avatar;
+    // Avatare anzeigen
+    avatarGrid.innerHTML = "";
+    AVATARS.forEach(av => {
+        const img = document.createElement("img");
+        img.src = `avatars/${av}.png`;
+        img.className = "avatar";
+        if (av === user.avatar)
+            img.classList.add("selected");
+        img.addEventListener("click", () => {
+            document.querySelectorAll(".avatar").forEach(a => a.classList.remove("selected"));
+            img.classList.add("selected");
+            selectedAvatar = av;
+        });
+        avatarGrid.appendChild(img);
+    });
+    // SPEICHERN
+    saveBtn.addEventListener("click", () => {
+        const newName = nameInput.value.trim();
+        const pw = pwInput.value;
+        const pwRepeat = pwRepeatInput.value;
+        if (!newName) {
+            error.textContent = "Name darf nicht leer sein";
+            return;
+        }
+        if (pw && pw !== pwRepeat) {
+            error.textContent = "Passwörter stimmen nicht überein";
+            return;
+        }
+        // Name ändern
+        users[userIndex].name = newName;
+        users[userIndex].avatar = selectedAvatar;
+        if (pw)
+            users[userIndex].password = pw;
+        localStorage.setItem("users", JSON.stringify(users));
+        localStorage.setItem("currentUser", newName);
+        alert("Profil gespeichert");
+        window.location.href = "index.html";
+    });
+    // ABBRECHEN
+    cancelBtn.addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
+}
+// 👉 HIER kommt jetzt dein kompletter Profil-Code rein
+// z.B.:
+// nameInput.value = user.name;
+// avatar anzeigen
+// speichern Button

@@ -108,7 +108,13 @@ padding-top: 45px;
     }
 
 
-
+.input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+}
 
     .family-actions button {
       padding: 10px 14px;
@@ -183,37 +189,63 @@ padding-top: 45px;
     grid-column: 1 / -1;
   }
 }
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.avatar {
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+}
+
+.avatar.selected {
+  border-color: #923fbe;
+}
+
   </style>
 </head>
 
-<body>
+<body id="profile-page">
   <div class="card">
-    <header>
-      <h1>Weekly Planner</h1>
-      <p>Plant eure Woche gemeinsam!</p>
 
+    <header>
+      <h1>Profil verwalten</h1>
+      <p>Weekly Planner</p>
     </header>
-    
 
     <div class="nav-bar">
       <button class="nav-btn" id="go-index">Wochenansicht</button>
       <button class="nav-btn" id="go-auswertung">Auswertung</button>
-      <button class="nav-btn" id="go-verbesserung">Verbesserungsziel</button>
-    <button id="logout-btn" class="logout-btn">Abmelden</button>
-
+      <button class="nav-btn active" id="go-profile">Profil</button>
+      <button id="logout-btn" class="logout-btn">Abmelden</button>
     </div>
-    
- <select id="week-select" class="week-dropdown">
-  <option value="1">Woche 1</option>
-  <option value="2">Woche 2</option>
-  <option value="3">Woche 3</option>
-  <option value="4">Woche 4</option>
-  <option value="5">Woche 5</option>
-  <option value="6">Woche 6</option>
-  <option value="7">Woche 7</option>
-</select>
 
-</div>
+    <label>Name</label>
+    <input id="profile-name" class="input" placeholder="Name">
+
+    <label>Neues Passwort</label>
+    <input id="profile-password" class="input" type="password">
+
+    <label>Passwort wiederholen</label>
+    <input id="profile-password-repeat" class="input" type="password">
+
+    <h3>Profilbild auswählen</h3>
+    <div id="profile-avatar-grid" class="avatar-grid"></div>
+
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button class="nav-btn add-btn" id="profile-save-btn">Speichern</button>
+      <button class="nav-btn reset-btn" id="profile-cancel-btn">Abbrechen</button>
+    </div>
+
+    <p class="error" id="profile-error"></p>
+
+  </div>
+
   <script src="dist/main.js"></script>
 </body>
-</html>
