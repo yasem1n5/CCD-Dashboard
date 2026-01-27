@@ -382,6 +382,51 @@ padding-top: 45px;
   height: 10px;
   border-radius: 50%;
 }
+.logout-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  background: #844aa3;
+  color: white;
+
+  border: none;
+  padding: 8px 14px;
+  border-radius: 12px;
+
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #6f3a8c;
+}
+.notes-box {
+  background: #faf7ff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: inset 0 0 0 1px #eee;
+  margin-top: 12px;
+}
+
+.notes-box h3 {
+  color: #923fbe;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+#shared-notes {
+  width: 100%;
+  height: 100px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  resize: vertical;
+  background: #fff;
+}
+
+
 @media (max-width: 700px) {
   .calendar-wrapper {
     grid-template-columns: 1fr;
@@ -442,8 +487,10 @@ padding-top: 45px;
 
       <button class="nav-btn add-btn" id="add-event-btn">+ Termin</button>    
       <button id="reset-week-btn" class="reset-btn">
-  Woche zurücksetzen
+        Woche zurücksetzen
 </button>     
+<button id="logout-btn" class="logout-btn">Abmelden</button>
+
     </div>
     
  <select id="week-select" class="week-dropdown">
@@ -463,20 +510,25 @@ padding-top: 45px;
   <div class="calendar" id="calendar"></div>
 
   <div class="calendar-legend">
-    <h3>Mitglieder</h3>
-    
-    <div id="legend-container"> <div class="members" id="members-container"></div></div>
-    <div class="family-box">
-      
-      <div class="member-input-wrapper">
-<input id="member-input" placeholder="Neue Person">
-<button id="add-member-btn">+</button>
-</div>
-    </div>
+  <h3>Mitglieder</h3>
+  <div id="legend-container">
+    <div class="members" id="members-container"></div>
+  </div>
+  
+  <!-- Notizblock separat unter Mitglieder -->
+  <div class="notes-box">
+    <h3>Notizen</h3>
+    <textarea id="shared-notes" placeholder="Hier können alle Mitglieder Notizen eintragen..."></textarea>
   </div>
 </div>
+</div>
+</div>
+    </div>
+    </div>
+    </div>
+</div>
 
-    
+    </body>
   </div>
   <script src="dist/main.js"></script>
 </body>

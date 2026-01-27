@@ -1,3 +1,89 @@
+const currentUser = localStorage.getItem("currentUser");
+// ======== PAGE PROTECTION ========
+// ======== LOGOUT ========
+const logoutBtn = document.getElementById("logout-btn");
+logoutBtn?.addEventListener("click", () => {
+  localStorage.removeItem("currentUser"); // Benutzer ausloggen
+  window.location.href = "login.html";    // Zur Login-Seite weiterleiten
+});
+const isAuthPage =
+  location.pathname.includes("login") ||
+  location.pathname.includes("register");
+
+if (!currentUser && !isAuthPage) {
+  window.location.href = "login.html";
+}
+
+type User = {
+  name: string;
+  password: string;
+};
+
+// ======== LOGIN ========
+const loginBtn = document.getElementById("login-btn") as HTMLButtonElement | null;
+const isLoginPage = document.getElementById("login-btn") !== null;
+const isRegisterPage = document.getElementById("register-btn") !== null;
+
+if (isLoginPage && loginBtn) {
+  loginBtn.addEventListener("click", () => {
+    const name = (document.getElementById("login-name") as HTMLInputElement).value.trim();
+    const password = (document.getElementById("login-password") as HTMLInputElement).value;
+
+    const storedUsers: User[] =
+  JSON.parse(localStorage.getItem("users") || "[]");
+
+const user = storedUsers.find(
+  u => u.name === name && u.password === password
+);
+
+    if (!user) {
+      const err = document.getElementById("login-error");
+      if (err) err.textContent = "Falsche Daten";
+      return;
+    }
+
+    localStorage.setItem("currentUser", name);
+    window.location.href = "index.html";
+  });
+}
+
+
+// ======== REGISTER ========
+const registerBtn = document.getElementById("register-btn") as HTMLButtonElement | null;
+
+if (isRegisterPage && registerBtn) {
+  registerBtn.addEventListener("click", () => {
+    const name = (document.getElementById("register-name") as HTMLInputElement).value.trim();
+    const pw1 = (document.getElementById("register-password") as HTMLInputElement).value;
+    const pw2 = (document.getElementById("register-password-repeat") as HTMLInputElement).value;
+
+    const error = document.getElementById("register-error");
+
+    if (!name || !pw1 || pw1 !== pw2) {
+      if (error) error.textContent = "Ungültige Eingabe";
+      return;
+    }
+
+    const storedUsers: User[] =
+  JSON.parse(localStorage.getItem("users") || "[]");
+
+if (storedUsers.some(u => u.name === name)) {
+  if (error) error.textContent = "Name existiert bereits";
+  return;
+}
+
+storedUsers.push({ name, password: pw1 });
+localStorage.setItem("users", JSON.stringify(storedUsers));
+
+addUserAsMember(name);
+
+
+    window.location.href = "login.html";
+  });
+}
+
+
+
 declare const Chart: any;
 
 const GENERAL_MEMBER = "gemeinsame zeit";
@@ -53,6 +139,13 @@ const loadMembers = (): string[] =>
 const saveMembers = (m: string[]) =>
   localStorage.setItem("members", JSON.stringify(m));
 
+function addUserAsMember(name: string) {
+  const members = loadMembers();
+  if (!members.includes(name)) {
+    members.push(name);
+    saveMembers(members);
+  }
+}
 // Events pro Woche
 const loadWeekEvents = (week: number): EventItem[] =>
   JSON.parse(localStorage.getItem(`events_week_${week}`) || "[]");
@@ -72,8 +165,7 @@ if (document.getElementById("calendar")) {
 
   const calendar = document.getElementById("calendar")!;
   const membersContainer = document.getElementById("members-container")!;
-  const memberInput = document.getElementById("member-input") as HTMLInputElement;
-  const addMemberBtn = document.getElementById("add-member-btn")!;
+  
   const addEventBtn = document.getElementById("add-event-btn")!;
   const resetBtn = document.getElementById("reset-week-btn")!;
   const weekSelect = document.getElementById("week-select") as HTMLSelectElement;
@@ -93,6 +185,19 @@ verbesserungBtn?.addEventListener("click", () => {
   localStorage.setItem("currentWeek", currentWeek.toString());
   window.location.href = "verbesserung.html";
 });
+
+// ---------- Gemeinsame Notizen ----------
+const sharedNotes = document.getElementById("shared-notes") as HTMLTextAreaElement;
+
+if (sharedNotes) {
+  // Lade gespeicherte Notizen
+  sharedNotes.value = localStorage.getItem("sharedNotes") || "";
+
+  // Speichere Änderungen automatisch
+  sharedNotes.addEventListener("input", () => {
+    localStorage.setItem("sharedNotes", sharedNotes.value);
+  });
+}
 
 
   // ---------- Reset Woche ----------  
@@ -131,10 +236,9 @@ function renderMembers() {
         display:inline-block;
       "></span>
       ${name}
-      <span class="delete-btn">×</span>
+  <span class="delete-btn" style="cursor:pointer; color:white;">×</span>
     `;
-
-    div.querySelector(".delete-btn")!.addEventListener("click", () => {
+     div.querySelector(".delete-btn")!.addEventListener("click", () => {
       if (!confirm(
         `Rolle ${name} wirklich löschen?\n\nAlle Termine dieser Person in ALLEN Wochen werden entfernt.`
       )) return;
@@ -143,6 +247,7 @@ function renderMembers() {
       if (idx !== -1) members.splice(idx, 1);
       saveMembers(members);
 
+      // Alle Events dieser Person löschen
       removeMemberFromAllWeeks(name);
 
       events = loadWeekEvents(currentWeek);
@@ -314,14 +419,7 @@ if (newContent !== ev.content) {
   }
 
   // ---------- Member hinzufügen ----------
-  addMemberBtn.addEventListener("click", () => {
-    const name = memberInput.value.trim();
-    if (!name || members.includes(name)) return;
-    members.push(name);
-    saveMembers(members);
-    memberInput.value = "";
-    renderMembers();
-  });
+
 
   // ---------- + Termin ----------
   addEventBtn.addEventListener("click", () => {
@@ -349,7 +447,6 @@ if (newContent !== ev.content) {
 // ================= ADD-EVENT.HTML =================
 if (document.getElementById("member-select")) {
 
-  const members = loadMembers();
   const memberSelect = document.getElementById("member-select") as HTMLSelectElement;
   const daySelect = document.getElementById("day-select") as HTMLSelectElement;
   const startInput = document.getElementById("start-time") as HTMLInputElement;
@@ -357,12 +454,20 @@ if (document.getElementById("member-select")) {
   const contentInput = document.getElementById("event-content") as HTMLTextAreaElement;
   const saveBtn = document.querySelector(".submit-btn")!;
   const backBtn = document.getElementById("back-btn")!;
+const currentUser = localStorage.getItem("currentUser");
 
+if (currentUser) {
+  memberSelect.innerHTML = `
+    <option value="${GENERAL_MEMBER}">Gemeinsame Zeit</option>
+    <option value="${currentUser}">Mein Eintrag (${currentUser})</option>
+  `;
+} else {
+  alert("Nicht eingeloggt");
+  window.location.href = "login.html";
+}
+  
   // Dropdowns füllen
-  memberSelect.innerHTML =
-    `<option value="allgemein">Allgemeiner Eintrag</option>` +
-    members.map(m => `<option value="${m}">${m}</option>`).join("");
-  daySelect.innerHTML = days.map(d => `<option value="${d.key}">${d.label}</option>`).join("");
+   daySelect.innerHTML = days.map(d => `<option value="${d.key}">${d.label}</option>`).join("");
 
   // Kategorien Checkboxen hinzufügen
   const categoryContainer = document.createElement("div");
@@ -389,6 +494,7 @@ if (document.getElementById("member-select")) {
   alert("Bitte Start- und Endzeit ausfüllen");
   return;
 }
+
     const startTime = startArr[0] + startArr[1]/60;
     const endTime = endArr[0] + endArr[1]/60;
     if (
@@ -404,7 +510,10 @@ if (document.getElementById("member-select")) {
     .map(cb => cb.value);
 
     events.push({
-      member: memberSelect.value,
+      member:
+  memberSelect.value === "gemeinsame zeit"
+    ? "gemeinsame zeit"
+    : localStorage.getItem("currentUser")!,
       day: daySelect.value as Day,
       start: startTime,
       end: endTime,
@@ -721,4 +830,6 @@ if (document.getElementById("go-index") && !document.getElementById("calendar") 
   verbesserungBtn?.addEventListener("click", () => {
     window.location.href = "verbesserung.html";
   });
+
+
 }

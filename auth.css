@@ -1,0 +1,53 @@
+body {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f7f3ff, #ffffff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.card {
+  background: white;
+  width: 360px;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 14px 40px rgba(90,0,204,0.12);
+  text-align: center;
+}
+
+h1 {
+  color: #923fbe;
+}
+
+.subtitle {
+  color: #905c9f;
+  margin-bottom: 18px;
+}
+
+input,
+button,
+textarea {
+  width: 100%;
+  height: 44px;           /* Gleiche Höhe für Inputs & Button */
+  padding: 0 12px;        /* Innenabstand links/rechts */
+  border-radius: 14px;
+  font-size: 16px;
+  box-sizing: border-box; /* Wichtig für exakte Höhe */
+  margin-bottom: 16px;    /* Abstand nach unten */
+}
+
+textarea {
+  height: 88px;           /* Größere Textarea */
+  padding: 8px 12px;
+  resize: vertical;
+}
+
+button {
+  border: none;
+  background: #844aa3;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;        /* Optional: etwas Abstand über Button */
+}
