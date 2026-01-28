@@ -2,6 +2,15 @@ const currentUser = localStorage.getItem("currentUser");
 
 // ======== PAGE PROTECTION ========
 // ======== LOGOUT ========
+const headerUser = document.getElementById("header-user");
+
+if (headerUser) {
+  const user = localStorage.getItem("currentUser");
+  if (user) {
+    headerUser.textContent = `Hallo, ${user}!`;
+  }
+}
+
 const logoutBtn = document.getElementById("logout-btn");
 logoutBtn?.addEventListener("click", () => {
   localStorage.removeItem("currentUser"); // Benutzer ausloggen
@@ -279,22 +288,38 @@ function renderMembers() {
   <span class="delete-btn" style="cursor:pointer; color:white;">×</span>
     `;
      div.querySelector(".delete-btn")!.addEventListener("click", () => {
-      if (!confirm(
-        `Rolle ${name} wirklich löschen?\n\nAlle Termine dieser Person in ALLEN Wochen werden entfernt.`
-      )) return;
+  if (!confirm(
+    `Rolle ${name} wirklich löschen?\n\nAlle Termine dieser Person in ALLEN Wochen werden entfernt.`
+  )) return;
 
-      const idx = members.indexOf(name);
-      if (idx !== -1) members.splice(idx, 1);
-      saveMembers(members);
+  // 1️⃣ Mitglied aus members entfernen
+  const idx = members.indexOf(name);
+  if (idx !== -1) members.splice(idx, 1);
+  saveMembers(members);
 
-      // Alle Events dieser Person löschen
-      removeMemberFromAllWeeks(name);
+  // 2️⃣ Alle Events dieser Person löschen
+  removeMemberFromAllWeeks(name);
 
-      events = loadWeekEvents(currentWeek);
-      renderMembers();
-      renderGrid();
-      renderEvents();
-    });
+  // 3️⃣ Nutzer aus users löschen
+  let storedUsers: User[] = JSON.parse(localStorage.getItem("users") || "[]");
+  storedUsers = storedUsers.filter(u => u.name !== name);
+  localStorage.setItem("users", JSON.stringify(storedUsers));
+
+  // 4️⃣ Wenn aktuell eingeloggter User gelöscht wurde → Logout
+  const currentUser = localStorage.getItem("currentUser");
+  if (currentUser === name) {
+    localStorage.removeItem("currentUser");
+    alert("Dein Konto wurde gelöscht. Du wurdest abgemeldet.");
+    window.location.href = "login.html";
+    return; // Stoppt weiteren Render
+  }
+
+  // 5️⃣ UI aktualisieren
+  events = loadWeekEvents(currentWeek);
+  renderMembers();
+  renderGrid();
+  renderEvents();
+});
 
     membersContainer.appendChild(div);
   });
@@ -991,9 +1016,6 @@ function initProfilePage() {
 }
 
 
-  // 👉 HIER kommt jetzt dein kompletter Profil-Code rein
-  // z.B.:
-  // nameInput.value = user.name;
-  // avatar anzeigen
-  // speichern Button
+
+  // 👉 PRPOFIL LÖSCHEN KOMMT HIER
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Weekly Planner</title>
-
+<link rel="icon" type="image/png" href="avatars/agenda.png">
   <style>
     * {
       box-sizing: border-box;
@@ -473,23 +473,98 @@ padding-top: 45px;
     grid-column: 1 / -1;
   }
 }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-right {
+  font-size: 0.95rem;
+  text-align: right;
+  margin-top: 4px;
+    color: #9b86b0;
+  font-weight: 500;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+}
+
+.header-user {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #923fbe;
+  background: #f3ecff;
+  padding: 8px 14px;
+  border-radius: 14px;
+}
+.title-row {
+  display: flex;
+  align-items: center; /* vertikal auf gleicher Höhe */
+  gap: 14px;
+}
+
+.header-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  margin-top: -2px;
+  border-radius: 10px;
+}
+
+.title-text h1 {
+  margin: 0;
+}
+
+.title-text p {
+  margin: 4px 0 0 0;
+}
+
+
   </style>
 </head>
 
 <body>
   <div class="card">
-    <header>
-      <h1>Weekly Planner</h1>
-      <p>Plant eure Woche gemeinsam!</p>
+    <header class="header-top">
+<div class="title-row">
+  <img src="avatars/agenda.png" alt="Agenda Icon" class="header-icon">
 
-    </header>
+  <div class="title-text">
+    <h1>Weekly Planner</h1>
+    <p>Plant eure Woche gemeinsam!</p>
+
+  </div>
+</div>
+  <div class="header-user" id="header-user"></div>
+</header>
     
-
     <div class="nav-bar">
       <button class="nav-btn" id="go-index">Wochenansicht</button>
       <button class="nav-btn" id="go-auswertung">Auswertung</button>
       <button class="nav-btn" id="go-profile">Profil bearbeiten</button>
 
+      
 
       <button class="nav-btn add-btn" id="add-event-btn">+ Termin</button>    
       <button id="reset-week-btn" class="reset-btn">

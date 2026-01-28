@@ -1,6 +1,13 @@
 const currentUser = localStorage.getItem("currentUser");
 // ======== PAGE PROTECTION ========
 // ======== LOGOUT ========
+const headerUser = document.getElementById("header-user");
+if (headerUser) {
+    const user = localStorage.getItem("currentUser");
+    if (user) {
+        headerUser.textContent = `Hallo, ${user}!`;
+    }
+}
 const logoutBtn = document.getElementById("logout-btn");
 logoutBtn === null || logoutBtn === void 0 ? void 0 : logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("currentUser"); // Benutzer ausloggen
@@ -196,12 +203,26 @@ if (document.getElementById("calendar")) {
             div.querySelector(".delete-btn").addEventListener("click", () => {
                 if (!confirm(`Rolle ${name} wirklich löschen?\n\nAlle Termine dieser Person in ALLEN Wochen werden entfernt.`))
                     return;
+                // 1️⃣ Mitglied aus members entfernen
                 const idx = members.indexOf(name);
                 if (idx !== -1)
                     members.splice(idx, 1);
                 saveMembers(members);
-                // Alle Events dieser Person löschen
+                // 2️⃣ Alle Events dieser Person löschen
                 removeMemberFromAllWeeks(name);
+                // 3️⃣ Nutzer aus users löschen
+                let storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
+                storedUsers = storedUsers.filter(u => u.name !== name);
+                localStorage.setItem("users", JSON.stringify(storedUsers));
+                // 4️⃣ Wenn aktuell eingeloggter User gelöscht wurde → Logout
+                const currentUser = localStorage.getItem("currentUser");
+                if (currentUser === name) {
+                    localStorage.removeItem("currentUser");
+                    alert("Dein Konto wurde gelöscht. Du wurdest abgemeldet.");
+                    window.location.href = "login.html";
+                    return; // Stoppt weiteren Render
+                }
+                // 5️⃣ UI aktualisieren
                 events = loadWeekEvents(currentWeek);
                 renderMembers();
                 renderGrid();
@@ -784,8 +805,4 @@ function initProfilePage() {
         window.location.href = "index.html";
     });
 }
-// 👉 HIER kommt jetzt dein kompletter Profil-Code rein
-// z.B.:
-// nameInput.value = user.name;
-// avatar anzeigen
-// speichern Button
+// 👉 PRPOFIL LÖSCHEN KOMMT HIER
