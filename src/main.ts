@@ -5,11 +5,25 @@ const currentUser = localStorage.getItem("currentUser");
 const headerUser = document.getElementById("header-user");
 
 if (headerUser) {
-  const user = localStorage.getItem("currentUser");
-  if (user) {
-    headerUser.textContent = `Hallo, ${user}!`;
+  const currentUserName = localStorage.getItem("currentUser");
+  if (currentUserName) {
+    // Nutzer aus LocalStorage laden
+    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
+    const user = users.find(u => u.name === currentUserName);
+    const avatar = user?.avatar || "avatar1"; // Fallback
+
+    // HTML mit Avatar + Name
+    headerUser.innerHTML = `
+      <div style="display:flex; align-items:center; gap:8px;">
+        <img src="avatars/${avatar}.png" 
+             alt="${currentUserName}" 
+             style="width:32px; height:32px; border-radius:8px;">
+        <span>Hallo, ${currentUserName}!</span>
+      </div>
+    `;
   }
 }
+
 
 const logoutBtn = document.getElementById("logout-btn");
 logoutBtn?.addEventListener("click", () => {

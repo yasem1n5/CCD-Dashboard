@@ -276,6 +276,65 @@ padding-top: 45px;
   margin: 4px 0 0 0;
 }
 
+/* Grid für Avatare */
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); /* größere Avatare */
+  gap: 20px; /* mehr Abstand zwischen Bildern */
+  justify-items: center;
+  margin: 20px 0;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 70px;  /* neue Größe */
+  height: 70px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avatar-wrapper:hover {
+  transform: scale(1.15); 
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  object-fit: cover;
+  transition: border-color 0.2s ease;
+}
+
+.avatar-wrapper.selected .avatar {
+  border-color: #923fbe; /* Rahmen für ausgewähltes Bild */
+}
+
+/* Overlay für ausgewähltes Bild */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 1.2rem;
+  background: rgba(146, 63, 190, 0.5);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.avatar-wrapper.selected .overlay,
+.avatar-wrapper:hover .overlay {
+  opacity: 1;
+}
+
 
   </style>
 </head>
@@ -316,7 +375,48 @@ padding-top: 45px;
     <input id="profile-password-repeat" class="input" type="password">
 
     <h3>Profilbild auswählen</h3>
-    <div id="profile-avatar-grid" class="avatar-grid"></div>
+<div id="profile-avatar-grid" class="avatar-grid">
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar1.png" class="avatar" alt="Avatar 1">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar2.png" class="avatar" alt="Avatar 2">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar3.png" class="avatar" alt="Avatar 3">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar4.png" class="avatar" alt="Avatar 4">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar5.png" class="avatar" alt="Avatar 5">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar6.png" class="avatar" alt="Avatar 6">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar7.png" class="avatar" alt="Avatar 7">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar8.png" class="avatar" alt="Avatar 8">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar9.png" class="avatar" alt="Avatar 9">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+  <div class="avatar-wrapper">
+    <img src="avatars/avatar10.png" class="avatar" alt="Avatar 10">
+    <div class="overlay"><span>✓</span></div>
+  </div>
+</div>
 
     <div style="display:flex; gap:10px; margin-top:10px;">
       <button class="nav-btn add-btn" id="profile-save-btn">Speichern</button>

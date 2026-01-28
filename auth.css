@@ -77,3 +77,22 @@ button {
   object-fit: cover;
   border: 2px solid #923fbe;
 }
+.avatar {
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.15); /* leicht vergrößern */
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2); /* Schatten für "Hover"-Gefühl */
+  border-color: #923fbe; /* optional: Randfarbe ändern beim Hover */
+}
+
+.avatar.selected {
+  border-color: #923fbe; /* für das ausgewählte Bild */
+}
+
