@@ -1,3 +1,8 @@
+// =====================
+// AUTHENTIFIZIERUNG
+// =====================
+// Lädt den aktuell eingeloggten Benutzer aus dem localStorage.
+// Wenn kein Benutzer eingeloggt ist, ist currentUser = null.
 const currentUser = localStorage.getItem("currentUser");
 // ======== PAGE PROTECTION ========
 // ======== LOGOUT ========
@@ -20,11 +25,19 @@ if (headerUser) {
     `;
     }
 }
+// LOGOUT FUNKTION
+// =====================
+// Entfernt den aktuell eingeloggten Benutzer aus dem localStorage
+// und leitet zurück zur Login-Seite.
 const logoutBtn = document.getElementById("logout-btn");
 logoutBtn === null || logoutBtn === void 0 ? void 0 : logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("currentUser"); // Benutzer ausloggen
     window.location.href = "login.html"; // Zur Login-Seite weiterleiten
 });
+// SEITENSCHUTZ (PAGE PROTECTION)
+// =====================
+// Verhindert, dass nicht eingeloggte Benutzer geschützte Seiten
+// wie den Kalender öffnen können.
 const isAuthPage = location.pathname.includes("login") ||
     location.pathname.includes("register");
 if (!currentUser && !isAuthPage) {
@@ -33,6 +46,8 @@ if (!currentUser && !isAuthPage) {
 const AVATARS = Array.from({ length: 10 }, (_, i) => `avatar${i + 1}`);
 let selectedAvatar = AVATARS[0];
 // ======== LOGIN ========
+// Prüft, ob Name und Passwort mit gespeicherten Nutzern übereinstimmen.
+// Wenn korrekt, wird der Benutzer eingeloggt.
 const loginBtn = document.getElementById("login-btn");
 const isLoginPage = document.getElementById("login-btn") !== null;
 const isRegisterPage = document.getElementById("register-btn") !== null;
@@ -75,6 +90,8 @@ if (isLoginPage && loginBtn) {
     });
 }
 // ======== REGISTER ========
+// Erstellt einen neuen Benutzer mit Name, Passwort und Avatar
+// und speichert ihn im localStorage.
 const registerBtn = document.getElementById("register-btn");
 if (isRegisterPage && registerBtn) {
     registerBtn.addEventListener("click", () => {
@@ -103,6 +120,10 @@ if (isRegisterPage && registerBtn) {
         window.location.href = "login.html";
     });
 }
+// KONSTANTEN & GRUNDEINSTELLUNGEN
+// =====================
+// Enthält feste Werte wie Zeitgrenzen, Wochenanzahl,
+// Farben und allgemeine Einstellungen.
 const GENERAL_MEMBER = "gemeinsame zeit";
 const GENERAL_COLOR = "#bdbdbd";
 const MIN_TIME = 6.5;
@@ -129,8 +150,10 @@ const colors = ["#e763cf", "#85a8d5", "#6bba89", "#c5b27b", "#a473c4"];
 const memberColors = {};
 // Kategorien
 const categories = ["Sport", "Lernen", "Handyzeit", "Erholung", "Familie", "Projektarbeit", "Hausaufgaben", "Videospiele"];
-// ---------- LocalStorage ----------
-// Mitglieder
+// DATENSPEICHER (LOCALSTORAGE)
+// =====================
+// Funktionen zum Laden und Speichern von Mitgliedern
+// und Events im Browser-Speicher.
 const loadMembers = () => JSON.parse(localStorage.getItem("members") || "[]");
 const saveMembers = (m) => localStorage.setItem("members", JSON.stringify(m));
 function addUserAsMember(name) {
@@ -149,7 +172,10 @@ function formatTime(t) {
     const m = Math.round((t - h) * 60);
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 }
-// ================= INDEX.HTML =================
+// KALENDERSEITE (INDEX.HTML)
+// =====================
+// Erstellt das Kalender-Grid,
+// zeigt Mitglieder an und rendert alle Events.
 if (document.getElementById("calendar")) {
     const calendar = document.getElementById("calendar");
     const membersContainer = document.getElementById("members-container");
@@ -259,7 +285,8 @@ if (document.getElementById("calendar")) {
   `;
         membersContainer.appendChild(generalDiv);
     }
-    // ---------- Kalender Grid ----------
+    // Erstellt das Kalender-Raster mit Uhrzeiten (6–23 Uhr)
+    // und 7 Wochentagen.
     function renderGrid() {
         calendar.innerHTML = `
       <div class="calendar-header">
@@ -274,7 +301,9 @@ if (document.getElementById("calendar")) {
       </div>
     `;
     }
-    // ---------- Events rendern ----------
+    // Zeigt alle gespeicherten Events im Kalender an.
+    // Berechnet Position, Höhe und Farbe der Event-Blöcke
+    // abhängig von Zeit, Tag und Mitglied.
     function renderEvents() {
         calendar.querySelectorAll(".event-block").forEach(e => e.remove());
         const dayWidth = (calendar.clientWidth - 80) / 7 - 4;
@@ -422,7 +451,11 @@ if (document.getElementById("calendar")) {
     renderEvents();
     window.addEventListener("resize", renderEvents);
 }
-// ================= ADD-EVENT.HTML =================
+// =====================
+// TERMIN ERSTELLEN (ADD-EVENT.HTML)
+// =====================
+// Hier wird ein neues Event mit Zeit, Tag,
+// Kategorien und Inhalt gespeichert.
 if (document.getElementById("member-select")) {
     const memberSelect = document.getElementById("member-select");
     const daySelect = document.getElementById("day-select");
@@ -495,7 +528,11 @@ if (document.getElementById("member-select")) {
         window.location.href = "index.html";
     });
 }
-// ================= AUSWERTUNG.HTML =================
+// =====================
+// STATISTIK & AUSWERTUNG
+// =====================
+// Berechnet Fokuszeit (Lernen etc.)
+// und Freizeitanteil in Prozent.
 function calculateFocusAndFreetime(events) {
     let fokus = 0;
     let freizeit = 0;
@@ -608,6 +645,8 @@ function renderMemberCards(week) {
         container.appendChild(card);
     });
 }
+// Erstellt Diagramme (Balken- und Kreisdiagramm)
+// zur Visualisierung der Wochenstatistik.
 if (document.getElementById("auswertung-page")) {
     const indexBtn = document.getElementById("go-index");
     const auswertungBtn = document.getElementById("go-auswertung");
@@ -753,6 +792,11 @@ if (document.getElementById("go-index") && !document.getElementById("calendar") 
 if (document.getElementById("profile-page")) {
     initProfilePage();
 }
+// =====================
+// PROFILSEITE
+// =====================
+// Ermöglicht das Ändern von Name, Passwort und Avatar.
+// Speichert Änderungen im localStorage.
 function initProfilePage() {
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     const currentUserName = localStorage.getItem("currentUser");
